@@ -1,1 +1,2 @@
+include ':lib-widget'
 include ':app', ':multiple-status-view'

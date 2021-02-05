@@ -8,6 +8,7 @@ import com.hazz.kotlinmvp.base.BaseFragment
 import com.hazz.kotlinmvp.showToast
 import com.hazz.kotlinmvp.ui.activity.AboutActivity
 import com.hazz.kotlinmvp.ui.activity.ProfileHomePageActivity
+import com.hazz.kotlinmvp.ui.activity.TestActivity
 import com.hazz.kotlinmvp.ui.activity.WatchHistoryActivity
 import com.hazz.kotlinmvp.utils.StatusBarUtil
 import kotlinx.android.synthetic.main.fragment_mine.*
@@ -69,7 +70,8 @@ class MineFragment : BaseFragment(),View.OnClickListener {
                 startActivity(intent)
             }
             v?.id==R.id.iv_about ->{
-                val intent = Intent(activity, AboutActivity::class.java)
+                //val intent = Intent(activity, AboutActivity::class.java)
+                val intent = Intent(activity, TestActivity::class.java)
                 startActivity(intent)
             }
             v?.id==R.id.tv_collection -> showToast("收藏")
