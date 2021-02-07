@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.fxq.lib.widget.R
@@ -18,20 +17,21 @@ import com.fxq.lib.widget.R
  * Author: Fanxq
  * Date: 2021/2/5
  */
-class ColorPicker : LinearLayout {
+class ColorPicker : RelativeLayout {
 
-  private lateinit var llColorProgress: View
-  private lateinit var vColorBarDot: View
+  private lateinit var mLLColorProgress: View
+  private lateinit var mColorBarDot: View
   private var red = 255
   private var green = 0
   private var blue = 0
   private var index = 0
-  private lateinit var llProgress: LinearLayout
-  private lateinit var vLocation: View
-  private lateinit var vBgColor: CardView
-  private lateinit var colorBarLayoutParams: RelativeLayout.LayoutParams
+  private lateinit var mLLProgress: LinearLayout
+  private lateinit var mLocation: View
+  private lateinit var mFakeBgColor:View
+  private lateinit var mBgColor: CardView
+  private lateinit var colorBarLayoutParams: LayoutParams
   private var onColorChangeListener: OnColorChangeListener? = null
-  private lateinit var vLocationLayoutParams: FrameLayout.LayoutParams
+  private lateinit var vLocationLayoutParams: LayoutParams
   private val transValue = 255 //透明度
 
   constructor(context: Context) : super(context) {
@@ -53,40 +53,42 @@ class ColorPicker : LinearLayout {
     initView(context)
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   private fun initView(context: Context) {
     val view: View = LayoutInflater.from(context).inflate(R.layout.view_color_picker, this)
-    vBgColor = view.findViewById(R.id.fl_color)
-    llProgress = view.findViewById(R.id.ll_progress)
-    vLocation = view.findViewById(R.id.view_location)
-    vLocationLayoutParams = vLocation.getLayoutParams() as FrameLayout.LayoutParams
-    llColorProgress = findViewById(R.id.ll_color_progress)
-    vColorBarDot = view.findViewById(R.id.view_color_bar_dot)
-    colorBarLayoutParams = vColorBarDot.getLayoutParams() as RelativeLayout.LayoutParams
+    mBgColor = view.findViewById(R.id.fl_color)
+    mFakeBgColor = view.findViewById(R.id.rl_fake_color)
+    mLLProgress = view.findViewById(R.id.ll_progress)
+    mLocation = view.findViewById(R.id.view_location)
+    vLocationLayoutParams = mLocation.layoutParams as LayoutParams
+    mLLColorProgress = findViewById(R.id.ll_color_progress)
+    mColorBarDot = view.findViewById(R.id.view_color_bar_dot)
+    colorBarLayoutParams = mColorBarDot.layoutParams as LayoutParams
 
     /*调整颜色*/
-    llColorProgress.setOnTouchListener({ v, event ->
-      val width = llColorProgress?.getWidth()
+    mLLColorProgress.setOnTouchListener { _, event ->
+      val width = mLLColorProgress.width
       val leftMargin = event.x
       var x = 0f
-      if (leftMargin < vColorBarDot?.getWidth() / 2.0f) {
-        colorBarLayoutParams?.leftMargin = 0
-      } else if (leftMargin > width - vColorBarDot.getWidth() / 2.0f) {
+      if (leftMargin < mColorBarDot.width / 2.0f) {
+        colorBarLayoutParams.leftMargin = 0
+      } else if (leftMargin > width - mColorBarDot.width / 2.0f) {
         x = 100f
-        colorBarLayoutParams?.leftMargin = width - vColorBarDot.getWidth()
+        colorBarLayoutParams.leftMargin = width - mColorBarDot.width
       } else {
         x = event.x / width * 100
-        colorBarLayoutParams?.leftMargin = (leftMargin - vColorBarDot.getWidth() / 2).toInt()
+        colorBarLayoutParams.leftMargin = (leftMargin - mColorBarDot.width / 2).toInt()
       }
-      vColorBarDot.setLayoutParams(colorBarLayoutParams)
+      mColorBarDot.layoutParams = colorBarLayoutParams
       onProgressChanged(x.toInt())
       true
-    })
+    }
 
     /*调整颜色明暗*/
-    vBgColor.setOnTouchListener { v, event ->
-      val width = vBgColor?.width
-      val height = vBgColor?.height
-      val action = event?.action
+    mFakeBgColor.setOnTouchListener { _, event ->
+      val width = mFakeBgColor.width
+      val height = mFakeBgColor.height
+      val action = event.action
       val leftMargin: Int
       val topMargin: Int
       when (action) {
@@ -94,23 +96,23 @@ class ColorPicker : LinearLayout {
         }
         MotionEvent.ACTION_MOVE -> {
           //防止越界处理
-          leftMargin = if (event.x > width - vLocation.width / 2f) {
-            width - vLocation.width
-          } else if (event.x < vLocation.width / 2f) {
+          leftMargin = if (event.x > width - mLocation.width / 2f) {
+            width - mLocation.width
+          } else if (event.x < mLocation.width / 2f) {
             0
           } else {
-            (event.x - vLocation.width / 2f).toInt()
+            (event.x - mLocation.width / 2f).toInt()
           }
-          topMargin = if (event.y > height - vLocation.height / 2f) {
-            height - vLocation.height
-          } else if (event.y <= vLocation.height / 2f) {
+          topMargin = if (event.y > height - mLocation.height / 2f) {
+            height - mLocation.height
+          } else if (event.y <= mLocation.height / 2f) {
             0
           } else {
-            (event.y - vLocation.height / 2f).toInt()
+            (event.y - mLocation.height / 2f).toInt()
           }
           vLocationLayoutParams.leftMargin = leftMargin
           vLocationLayoutParams.topMargin = topMargin
-          vLocation.layoutParams = vLocationLayoutParams
+          mLocation.layoutParams = vLocationLayoutParams
           changeColor()
         }
         MotionEvent.ACTION_UP -> {
@@ -159,7 +161,7 @@ class ColorPicker : LinearLayout {
       }
       else -> red = 255
     }
-    vBgColor?.setCardBackgroundColor(Color.rgb(red, green, blue))
+    mBgColor.setCardBackgroundColor(Color.rgb(red, green, blue))
     showColorBarDot()
     changeColor()
   }
@@ -169,7 +171,7 @@ class ColorPicker : LinearLayout {
     gd.setColor(Color.rgb(red, green, blue))
     gd.cornerRadius = 24f
     gd.setStroke(9, Color.parseColor("#ffffff")) //描边的颜色和宽度
-    vColorBarDot.setBackground(gd)
+    mColorBarDot.background = gd
   }
 
   /**
@@ -180,8 +182,8 @@ class ColorPicker : LinearLayout {
     var tempGreen = green
     var tempBlue = blue
     val hPercent =
-      1 - vLocation?.x / (vBgColor?.width - vLocation?.width)
-    val vPercent = vLocation?.y / (vBgColor?.height - vLocation?.height)
+      1 - mLocation.x / (mFakeBgColor.width - mLocation.width)
+    val vPercent = mLocation.y / (mFakeBgColor.height - mLocation.height)
     when (index) {
       0 -> {
         tempGreen = (green + hPercent * (255 - green)).toInt()
@@ -217,11 +219,12 @@ class ColorPicker : LinearLayout {
 
   override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
     super.onWindowFocusChanged(hasWindowFocus)
-    val layoutParams = vLocation.layoutParams as FrameLayout.LayoutParams
-    layoutParams.leftMargin = vBgColor.width - vLocation.width
-    vLocation.layoutParams = layoutParams
-    colorBarLayoutParams.leftMargin = llColorProgress.width - vColorBarDot.width
-    vColorBarDot.layoutParams = colorBarLayoutParams
+    val layoutParams = mLocation.layoutParams as LayoutParams
+    layoutParams.leftMargin = mFakeBgColor.width - mLocation.width
+    mLocation.layoutParams = layoutParams
+    mLocation.post { changeColor() }
+    colorBarLayoutParams.leftMargin = mLLColorProgress.width - mColorBarDot.width
+    mColorBarDot.layoutParams = colorBarLayoutParams
     showColorBarDot()
   }
 
@@ -232,15 +235,6 @@ class ColorPicker : LinearLayout {
    */
   fun setOnColorChangeListener(onColorChangeListener: OnColorChangeListener?) {
     this.onColorChangeListener = onColorChangeListener
-  }
-
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-    super.onSizeChanged(w, h, oldw, oldh)
-    vBgColor.post {
-      val layoutParams = vBgColor.layoutParams as LayoutParams
-      layoutParams.height = h - llProgress.height
-      vBgColor.layoutParams = layoutParams
-    }
   }
 
   override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
