@@ -3,6 +3,7 @@ package com.fxq.kotlin.mvvm.ui.fragment
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.util.DisplayMetrics
@@ -23,6 +24,7 @@ import com.hazz.kotlinmvp.R
 class ColorPickerFragment : DialogFragment() {
 
   var mOnColorChangeListener: OnColorChangeListener? = null
+  var colorId = -3987159
   private lateinit var mColorPicker: ColorPicker
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -45,7 +47,8 @@ class ColorPickerFragment : DialogFragment() {
   private fun getDialogView(activity: Activity): View? {
     val view: View = LayoutInflater.from(activity).inflate(R.layout.fragment_color_picker, null)
     mColorPicker = view.findViewById(R.id.cpv_color_picker)
-    mColorPicker.setOnColorChangeListener(mOnColorChangeListener)
+    mColorPicker.onColorChangeListener = mOnColorChangeListener
+    mColorPicker.initColor(colorId)
     return view
   }
 

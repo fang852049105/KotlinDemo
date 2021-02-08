@@ -21,18 +21,15 @@ class ColorPicker : RelativeLayout {
 
   private lateinit var mLLColorProgress: View
   private lateinit var mColorBarDot: View
-  private var red = 255
-  private var green = 0
-  private var blue = 0
-  private var index = 0
   private lateinit var mLLProgress: LinearLayout
   private lateinit var mLocation: View
-  private lateinit var mFakeBgColor:View
+  private lateinit var mFakeBgColor: View
   private lateinit var mBgColor: CardView
   private lateinit var colorBarLayoutParams: LayoutParams
-  private var onColorChangeListener: OnColorChangeListener? = null
+  var onColorChangeListener: OnColorChangeListener? = null
   private lateinit var vLocationLayoutParams: LayoutParams
-  private val transValue = 255 //透明度
+  private val mCurrentHSV = FloatArray(3)
+  private val mBgHSV = floatArrayOf(1f, 1f, 1f)
 
   constructor(context: Context) : super(context) {
     initView(context)
@@ -80,7 +77,7 @@ class ColorPicker : RelativeLayout {
         colorBarLayoutParams.leftMargin = (leftMargin - mColorBarDot.width / 2).toInt()
       }
       mColorBarDot.layoutParams = colorBarLayoutParams
-      onProgressChanged(x.toInt())
+      onProgressChanged(x)
       true
     }
 
@@ -128,47 +125,21 @@ class ColorPicker : RelativeLayout {
    * @param progressColor
    */
   @SuppressLint("WrongConstant")
-  private fun onProgressChanged(progressColor: Int) {
-    red = 0
-    green = 0
-    blue = 0
-    index = (progressColor / (100 / 6f)).toInt()
-    val v = progressColor % (100 / 6f) / (100 / 6f)
-    when (index) {
-      0 -> {
-        red = 255
-        green = (255 * v).toInt()
-      }
-      1 -> {
-        red = (255 * (1 - v)).toInt()
-        green = 255
-      }
-      2 -> {
-        green = 255
-        blue = (255 * v).toInt()
-      }
-      3 -> {
-        green = (255 * (1 - v)).toInt()
-        blue = 255
-      }
-      4 -> {
-        blue = 255
-        red = (255 * v).toInt()
-      }
-      5 -> {
-        blue = (255 * (1 - v)).toInt()
-        red = 255
-      }
-      else -> red = 255
+  private fun onProgressChanged(progressColor: Float) {
+    var x = progressColor
+    if (x == 0f) {
+      x = 0.001f
     }
-    mBgColor.setCardBackgroundColor(Color.rgb(red, green, blue))
+    var colorHue = 360f * x / 100f
+    setColorHue(colorHue)
+    mBgColor.setCardBackgroundColor(Color.HSVToColor(mBgHSV))
     showColorBarDot()
     changeColor()
   }
 
   private fun showColorBarDot() {
     val gd = GradientDrawable()
-    gd.setColor(Color.rgb(red, green, blue))
+    gd.setColor(Color.HSVToColor(mBgHSV))
     gd.cornerRadius = 24f
     gd.setStroke(9, Color.parseColor("#ffffff")) //描边的颜色和宽度
     mColorBarDot.background = gd
@@ -178,63 +149,51 @@ class ColorPicker : RelativeLayout {
    * 颜色明暗度调整
    */
   private fun changeColor() {
-    var tempRed = red
-    var tempGreen = green
-    var tempBlue = blue
-    val hPercent =
-      1 - mLocation.x / (mFakeBgColor.width - mLocation.width)
-    val vPercent = mLocation.y / (mFakeBgColor.height - mLocation.height)
-    when (index) {
-      0 -> {
-        tempGreen = (green + hPercent * (255 - green)).toInt()
-        tempBlue = (blue + hPercent * (255 - blue)).toInt()
-      }
-      1 -> {
-        tempRed = (red + hPercent * (255 - red)).toInt()
-        tempBlue = (blue + hPercent * (255 - blue)).toInt()
-      }
-      2 -> {
-        tempRed = (red + hPercent * (255 - red)).toInt()
-        tempBlue = (blue + hPercent * (255 - blue)).toInt()
-      }
-      3 -> {
-        tempRed = (red + hPercent * (255 - red)).toInt()
-        tempGreen = (green + hPercent * (255 - green)).toInt()
-      }
-      4 -> {
-        tempRed = (red + hPercent * (255 - red)).toInt()
-        tempGreen = (green + hPercent * (255 - green)).toInt()
-      }
-      5, 6 -> {
-        tempGreen = (green + hPercent * (255 - green)).toInt()
-        tempBlue = (blue + hPercent * (255 - blue)).toInt()
-      }
-    }
-    tempRed = (tempRed - tempRed * vPercent).toInt()
-    tempGreen = (tempGreen - tempGreen * vPercent).toInt()
-    tempBlue = (tempBlue - tempBlue * vPercent).toInt()
-    val color = Color.argb(transValue, tempRed, tempGreen, tempBlue)
+    var hPercent = mLocation.x / (mFakeBgColor.width)
+    var vPercent = mLocation.y / (mFakeBgColor.height)
+    setColorSat(1f * hPercent) //颜色深浅
+    setColorVal(1f - 1f * vPercent) //颜色明暗
+    val color = Color.HSVToColor(mCurrentHSV)
+
     onColorChangeListener?.colorChanged(color)
   }
 
-  override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-    super.onWindowFocusChanged(hasWindowFocus)
-    val layoutParams = mLocation.layoutParams as LayoutParams
-    layoutParams.leftMargin = mFakeBgColor.width - mLocation.width
-    mLocation.layoutParams = layoutParams
-    mLocation.post { changeColor() }
-    colorBarLayoutParams.leftMargin = mLLColorProgress.width - mColorBarDot.width
-    mColorBarDot.layoutParams = colorBarLayoutParams
+  fun initColor(color: Int) {
+    Color.colorToHSV(color, mCurrentHSV)
+    mBgHSV[0] = mCurrentHSV[0]
     showColorBarDot()
+    mBgColor.setCardBackgroundColor(Color.HSVToColor(mBgHSV))
+    mLocation.post {
+      colorBarLayoutParams.leftMargin = (mLLColorProgress.width * mCurrentHSV[0] / 360f).toInt()
+      mColorBarDot.layoutParams = colorBarLayoutParams
+      vLocationLayoutParams.leftMargin = (mFakeBgColor.width * mCurrentHSV[1]).toInt()
+      vLocationLayoutParams.topMargin = (mFakeBgColor.height * (1f- mCurrentHSV[2])).toInt()
+      mLocation.layoutParams = vLocationLayoutParams
+    }
+  }
+
+
+  /**
+   * 设置色彩
+   * @param color
+   */
+  private fun setColorHue(color: Float) {
+    mBgHSV[0] = color
+    mCurrentHSV[0] = color
   }
 
   /**
-   * 设置该方法，颜色改变的时候会回调颜色值
-   *
-   * @param onColorChangeListener
+   * 设置颜色深浅
    */
-  fun setOnColorChangeListener(onColorChangeListener: OnColorChangeListener?) {
-    this.onColorChangeListener = onColorChangeListener
+  private fun setColorSat(color: Float) {
+    mCurrentHSV[1] = color
+  }
+
+  /**
+   * 设置颜色明暗
+   */
+  private fun setColorVal(color: Float) {
+    mCurrentHSV[2] = color
   }
 
   override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

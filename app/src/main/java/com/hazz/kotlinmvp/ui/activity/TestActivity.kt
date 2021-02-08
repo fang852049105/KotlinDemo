@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_test.tv_show
 class TestActivity : BaseActivity() {
 
   private var colorPickerFragment: ColorPickerFragment?= null
+  private var currentColorId = -3987159
   override fun layoutId(): Int {
     return R.layout.activity_test
   }
@@ -25,19 +26,20 @@ class TestActivity : BaseActivity() {
   }
 
   override fun initView() {
-    cpv_color_picker.setOnColorChangeListener(object : OnColorChangeListener {
-      override fun colorChanged(color: Int) {
-        Log.e("fxq", "color = $color")
-        //tv_show.setBackgroundColor(color)
-      }
-    })
+    tv_show.setBackgroundColor(-1702394)
     tv_show.setOnClickListener(View.OnClickListener {
       //cpv_color_picker.visibility = View.VISIBLE
       colorPickerFragment?.let {
+        it.colorId = currentColorId
         it.show(supportFragmentManager, "colorPicker")
       } ?: ColorPickerFragment().let {
         colorPickerFragment = it
-        it.mOnColorChangeListener = OnColorChangeListener { color -> tv_show.setBackgroundColor(color) }
+        it.mOnColorChangeListener = OnColorChangeListener { color ->
+          tv_show.setBackgroundColor(color)
+          currentColorId = color
+          Log.e("fxq", "color = $color")
+        }
+        it.colorId = currentColorId
         it.show(supportFragmentManager, "colorPicker")
       }
     })
