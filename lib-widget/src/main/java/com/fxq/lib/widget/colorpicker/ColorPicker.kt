@@ -149,8 +149,8 @@ class ColorPicker : RelativeLayout {
    * 颜色明暗度调整
    */
   private fun changeColor() {
-    var hPercent = mLocation.x / (mFakeBgColor.width)
-    var vPercent = mLocation.y / (mFakeBgColor.height)
+    var hPercent = mLocation.x / (mFakeBgColor.width - mLocation.width)
+    var vPercent = mLocation.y / (mFakeBgColor.height - mLocation.height)
     setColorSat(1f * hPercent) //颜色深浅
     setColorVal(1f - 1f * vPercent) //颜色明暗
     val color = Color.HSVToColor(mCurrentHSV)
@@ -166,8 +166,8 @@ class ColorPicker : RelativeLayout {
     mLocation.post {
       colorBarLayoutParams.leftMargin = (mLLColorProgress.width * mCurrentHSV[0] / 360f).toInt()
       mColorBarDot.layoutParams = colorBarLayoutParams
-      vLocationLayoutParams.leftMargin = (mFakeBgColor.width * mCurrentHSV[1]).toInt()
-      vLocationLayoutParams.topMargin = (mFakeBgColor.height * (1f- mCurrentHSV[2])).toInt()
+      vLocationLayoutParams.leftMargin = ((mFakeBgColor.width - mLocation.width) * mCurrentHSV[1]).toInt()
+      vLocationLayoutParams.topMargin = ((mFakeBgColor.height - mLocation.height) * (1f- mCurrentHSV[2])).toInt()
       mLocation.layoutParams = vLocationLayoutParams
     }
   }
