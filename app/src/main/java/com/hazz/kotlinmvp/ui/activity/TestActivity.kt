@@ -18,7 +18,9 @@ class TestActivity : BaseActivity() {
 
   private var colorPickerFragment: ColorPickerFragment?= null
   //private var currentColorId = -16711936
-  private var currentColorId = -1
+  //private var currentColorId = -16777216
+  private var currentColorId = -16777216
+
 
   override fun layoutId(): Int {
     return R.layout.activity_test
@@ -36,7 +38,13 @@ class TestActivity : BaseActivity() {
         it.show(supportFragmentManager, "colorPicker")
       } ?: ColorPickerFragment().let {
         colorPickerFragment = it
-        it.mOnColorChangeListener = OnColorChangeListener { color ->
+        it.mOnColorChangeListener = OnColorChangeListener { color,isEnd ->
+          if (!isEnd) {
+            return@OnColorChangeListener
+          }
+          if (currentColorId == color) {
+            return@OnColorChangeListener
+          }
           tv_show.setBackgroundColor(color)
           currentColorId = color
           Log.e("fxq", "color = $color")

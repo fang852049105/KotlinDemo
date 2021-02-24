@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.fxq.lib.widget.R
+import kotlin.math.abs
 
 /**
  * Author: Fanxq
@@ -66,6 +67,7 @@ class ColorPicker : RelativeLayout {
     mLLColorProgress.setOnTouchListener { _, event ->
       val width = mLLColorProgress.width
       val leftMargin = event.x
+      val action = event.action
       var x = 0f
       if (leftMargin < mColorBarDot.width / 2.0f) {
         colorBarLayoutParams.leftMargin = 0
@@ -78,6 +80,17 @@ class ColorPicker : RelativeLayout {
       }
       mColorBarDot.layoutParams = colorBarLayoutParams
       onProgressChanged(x)
+      when (action) {
+        MotionEvent.ACTION_DOWN -> {
+        }
+        MotionEvent.ACTION_MOVE -> {
+          changeColor(false)
+        }
+        MotionEvent.ACTION_UP -> {
+          changeColor(true)
+        }
+      }
+
       true
     }
 
@@ -110,9 +123,10 @@ class ColorPicker : RelativeLayout {
           vLocationLayoutParams.leftMargin = leftMargin
           vLocationLayoutParams.topMargin = topMargin
           mLocation.layoutParams = vLocationLayoutParams
-          changeColor()
+          changeColor(false)
         }
         MotionEvent.ACTION_UP -> {
+          changeColor(true)
         }
       }
       true
@@ -124,7 +138,6 @@ class ColorPicker : RelativeLayout {
    *
    * @param progressColor
    */
-  @SuppressLint("WrongConstant")
   private fun onProgressChanged(progressColor: Float) {
     var x = progressColor
     if (x == 0f) {
@@ -134,7 +147,6 @@ class ColorPicker : RelativeLayout {
     setColorHue(colorHue)
     mBgColor.setCardBackgroundColor(Color.HSVToColor(mBgHSV))
     showColorBarDot()
-    changeColor()
   }
 
   private fun showColorBarDot() {
@@ -148,14 +160,13 @@ class ColorPicker : RelativeLayout {
   /**
    * 颜色明暗度调整
    */
-  private fun changeColor() {
+  private fun changeColor(isEnd: Boolean) {
     var hPercent = mLocation.x / (mFakeBgColor.width - mLocation.width)
     var vPercent = mLocation.y / (mFakeBgColor.height - mLocation.height)
     setColorSat(1f * hPercent) //颜色深浅
     setColorVal(1f - 1f * vPercent) //颜色明暗
     val color = Color.HSVToColor(mCurrentHSV)
-
-    onColorChangeListener?.colorChanged(color)
+    onColorChangeListener?.colorChanged(color, isEnd)
   }
 
   fun initColor(color: Int) {

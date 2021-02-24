@@ -67,13 +67,7 @@ class ColorPickerFragment : DialogFragment() {
     dialog.setCancelable(true)
     dialog.window
       ?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    dialog.setOnKeyListener { dialog, keyCode, event ->
-      if (keyCode === KeyEvent.KEYCODE_BACK) {
-        dismissAllowingStateLoss()
-        return@setOnKeyListener true
-      }
-      false
-    }
+
   }
 
   fun updatePosition() {
