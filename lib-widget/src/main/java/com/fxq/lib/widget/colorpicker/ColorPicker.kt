@@ -32,6 +32,8 @@ class ColorPicker : RelativeLayout {
   private val mCurrentHSV = FloatArray(3)
   private val mBgHSV = floatArrayOf(1f, 1f, 1f)
 
+  private val isRtl = true
+
   constructor(context: Context) : super(context) {
     initView(context)
   }
@@ -174,6 +176,9 @@ class ColorPicker : RelativeLayout {
     mBgHSV[0] = mCurrentHSV[0]
     showColorBarDot()
     mBgColor.setCardBackgroundColor(Color.HSVToColor(mBgHSV))
+    if (color == 0) {
+      return
+    }
     mLocation.post {
       colorBarLayoutParams.leftMargin = (mLLColorProgress.width * mCurrentHSV[0] / 360f).toInt()
       mColorBarDot.layoutParams = colorBarLayoutParams
@@ -211,4 +216,6 @@ class ColorPicker : RelativeLayout {
     parent.requestDisallowInterceptTouchEvent(true)
     return super.dispatchTouchEvent(ev)
   }
+
+
 }

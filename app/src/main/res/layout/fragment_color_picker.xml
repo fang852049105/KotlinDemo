@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
+
 
   <LinearLayout
       android:id="@+id/layout_expand"
@@ -10,11 +11,26 @@
       android:layout_alignParentBottom="true"
       android:background="@drawable/bg_color_picker_fragment"
       android:orientation="vertical">
+    <FrameLayout
+        android:id="@+id/board_top"
+        android:layout_width="match_parent"
+        android:layout_height="25dp">
+      <ImageButton
+          android:id="@+id/btn_expand"
+          android:layout_width="32dp"
+          android:layout_height="4dp"
+          android:layout_marginTop="12dp"
+          android:background="@null"
+          android:clickable="false"
+          android:layout_gravity="center_horizontal"
+          android:focusable="false"
+          android:src="@drawable/editorx_icon_clip_arrow_up_shape"
+          />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_marginTop="20dp"
         android:gravity="center_vertical">
       <TextView
           android:layout_width="wrap_content"
@@ -39,7 +55,7 @@
           android:layout_alignParentRight="true"
           android:paddingEnd="16dp"/>
     </RelativeLayout>
-    
+
     <com.fxq.lib.widget.colorpicker.ColorPicker
         android:id="@+id/cpv_color_picker"
         android:layout_width="match_parent"
@@ -48,5 +64,11 @@
 
   </LinearLayout>
 
+
+  <View
+      android:id="@+id/top_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_above="@+id/layout_expand"/>
 
 </RelativeLayout>
