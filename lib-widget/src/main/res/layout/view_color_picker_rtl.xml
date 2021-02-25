@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#202226"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:supportsRtl="true">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/fl_color"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:cardCornerRadius="4dp"
+        app:cardBackgroundColor="#ffff0000"
+        app:cardElevation="0dp"
+        android:layout_margin="16dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_white_gradually_trans_rtl" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_black_gradually_trans" />
+
+    </android.support.v7.widget.CardView>
+
+    <RelativeLayout
+        android:id="@+id/rl_fake_color"
+        android:layout_width="match_parent"
+        android:layout_height="216dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent">
+
+        <View
+            android:id="@+id/view_location"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/shape_stroke_dot"
+            android:clickable="false"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_progress"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/fl_color"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rl_color_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/ll_color_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="28dp"
+                        android:padding="10dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:visibility="visible"
+                            android:background="@drawable/shape_red_green_01_rtl" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:visibility="visible"
+                            android:background="@drawable/shape_red_green_02_rtl" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:visibility="visible"
+                            android:background="@drawable/shape_green_blue_01_rtl" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:visibility="visible"
+                            android:background="@drawable/shape_green_blue_02_rtl" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:visibility="visible"
+                            android:background="@drawable/shape_blue_red_01_rtl" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:visibility="visible"
+                            android:background="@drawable/shape_blue_red_02_rtl" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/view_color_bar_dot"
+                    android:layout_width="16dp"
+                    android:layout_height="20dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/shape_color_pick_bar_dot" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

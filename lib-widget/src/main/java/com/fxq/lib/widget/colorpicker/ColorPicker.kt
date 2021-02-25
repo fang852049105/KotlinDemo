@@ -55,7 +55,11 @@ class ColorPicker : RelativeLayout {
 
   @SuppressLint("ClickableViewAccessibility")
   private fun initView(context: Context) {
-    val view: View = LayoutInflater.from(context).inflate(R.layout.view_color_picker, this)
+    var layoutId = R.layout.view_color_picker
+    if (isRtl) {
+      layoutId = R.layout.view_color_picker_rtl
+    }
+    val view: View = LayoutInflater.from(context).inflate(layoutId, this)
     mBgColor = view.findViewById(R.id.fl_color)
     mFakeBgColor = view.findViewById(R.id.rl_fake_color)
     mLLProgress = view.findViewById(R.id.ll_progress)
@@ -68,7 +72,10 @@ class ColorPicker : RelativeLayout {
     /*调整颜色*/
     mLLColorProgress.setOnTouchListener { _, event ->
       val width = mLLColorProgress.width
-      val leftMargin = event.x
+      var leftMargin = event.x
+      if (isRtl) {
+        leftMargin = width - event.x
+      }
       val action = event.action
       var x = 0f
       if (leftMargin < mColorBarDot.width / 2.0f) {
@@ -78,7 +85,12 @@ class ColorPicker : RelativeLayout {
         colorBarLayoutParams.leftMargin = width - mColorBarDot.width
       } else {
         x = event.x / width * 100
-        colorBarLayoutParams.leftMargin = (leftMargin - mColorBarDot.width / 2).toInt()
+        if (isRtl) {
+          colorBarLayoutParams.rightMargin = (leftMargin - mColorBarDot.width / 2).toInt()
+        } else {
+          colorBarLayoutParams.leftMargin = (leftMargin - mColorBarDot.width / 2).toInt()
+        }
+
       }
       mColorBarDot.layoutParams = colorBarLayoutParams
       onProgressChanged(x)
@@ -108,12 +120,22 @@ class ColorPicker : RelativeLayout {
         }
         MotionEvent.ACTION_MOVE -> {
           //防止越界处理
-          leftMargin = if (event.x > width - mLocation.width / 2f) {
-            width - mLocation.width
-          } else if (event.x < mLocation.width / 2f) {
-            0
+          if (isRtl) {
+            leftMargin = if (event.x > width) {
+              width
+            } else if (event.x < mLocation.width / 2f) {
+              0
+            } else {
+              (event.x - mLocation.width / 2f).toInt()
+            }
           } else {
-            (event.x - mLocation.width / 2f).toInt()
+            leftMargin = if (event.x > width - mLocation.width / 2f) {
+              width - mLocation.width
+            } else if (event.x < mLocation.width / 2f) {
+              0
+            } else {
+              (event.x - mLocation.width / 2f).toInt()
+            }
           }
           topMargin = if (event.y > height - mLocation.height / 2f) {
             height - mLocation.height
@@ -122,7 +144,11 @@ class ColorPicker : RelativeLayout {
           } else {
             (event.y - mLocation.height / 2f).toInt()
           }
-          vLocationLayoutParams.leftMargin = leftMargin
+          if (isRtl) {
+            vLocationLayoutParams.rightMargin = width - leftMargin
+          } else {
+            vLocationLayoutParams.leftMargin = leftMargin
+          }
           vLocationLayoutParams.topMargin = topMargin
           mLocation.layoutParams = vLocationLayoutParams
           changeColor(false)
@@ -142,6 +168,9 @@ class ColorPicker : RelativeLayout {
    */
   private fun onProgressChanged(progressColor: Float) {
     var x = progressColor
+    if (isRtl) {
+      x = 100 - progressColor
+    }
     if (x == 0f) {
       x = 0.001f
     }
@@ -165,7 +194,11 @@ class ColorPicker : RelativeLayout {
   private fun changeColor(isEnd: Boolean) {
     var hPercent = mLocation.x / (mFakeBgColor.width - mLocation.width)
     var vPercent = mLocation.y / (mFakeBgColor.height - mLocation.height)
-    setColorSat(1f * hPercent) //颜色深浅
+    if (isRtl) {
+      setColorSat(1f - 1f * hPercent) //颜色深浅
+    } else {
+      setColorSat(1f * hPercent) //颜色深浅
+    }
     setColorVal(1f - 1f * vPercent) //颜色明暗
     val color = Color.HSVToColor(mCurrentHSV)
     onColorChangeListener?.colorChanged(color, isEnd)
