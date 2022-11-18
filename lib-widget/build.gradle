@@ -4,7 +4,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions' //扩展插件
 
 apply plugin: 'kotlin-kapt'  //kapt3插件
-
+//apply plugin: 'maven-publish'
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.fxq'
+archivesBaseName = "lib-widget"
 android {
 
   compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -29,3 +32,13 @@ dependencies {
   implementation rootProject.ext.supportLibs    //kotlin 支持库
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
+
+//publishing {
+//  publications {
+//    maven(MavenPublication) {
+//      groupId project.group
+//      artifactId archivesBaseName
+//      version project.version
+//    }
+//  }
+//}

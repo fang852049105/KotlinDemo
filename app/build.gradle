@@ -134,8 +134,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"
 
-    implementation project(':lib-widget')
-
+//    implementation project(':lib-widget')
+    implementation 'com.github.fang852049105:lib-widget:1.1'
 
 
 }
