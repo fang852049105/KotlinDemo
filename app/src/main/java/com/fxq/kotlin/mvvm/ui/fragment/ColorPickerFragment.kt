@@ -1,5 +1,9 @@
 package com.fxq.kotlin.mvvm.ui.fragment
 
+import android.animation.Keyframe
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -12,10 +16,11 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.fxq.lib.widget.colorpicker.ColorPicker
 import com.fxq.lib.widget.colorpicker.OnColorChangeListener
 import com.hazz.kotlinmvp.R
@@ -30,9 +35,14 @@ class ColorPickerFragment : DialogFragment() {
   var colorId = -3987159
   private lateinit var mColorPicker: ColorPicker
   private lateinit var mHandleView: FrameLayout
+  private lateinit var mLayoutExpand: LinearLayout
+  private lateinit var mLayoutExpandParams: RelativeLayout.LayoutParams
   private lateinit var mTopView: View
-
+  private var mDy = 0f
   private var mLastYPosition = 0f
+  private var mExpandDefaultHeight = 0
+  private var mIsExpanded = false
+
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val activity: Activity = activity!!
     val view = getDialogView(activity!!)
@@ -53,6 +63,9 @@ class ColorPickerFragment : DialogFragment() {
   private fun getDialogView(activity: Activity): View? {
     val view: View = LayoutInflater.from(activity).inflate(R.layout.fragment_color_picker, null)
     mColorPicker = view.findViewById(R.id.cpv_color_picker)
+    mLayoutExpand = view.findViewById(R.id.layout_expand)
+    mExpandDefaultHeight = 332 * 3
+    mLayoutExpandParams = mLayoutExpand.layoutParams as RelativeLayout.LayoutParams
     mTopView = view.findViewById(R.id.top_view)
     mTopView.setOnClickListener {
       dismissAllowingStateLoss()
@@ -62,16 +75,24 @@ class ColorPickerFragment : DialogFragment() {
       when (event.action) {
         MotionEvent.ACTION_DOWN -> {
           mLastYPosition = event.y
-
         }
         MotionEvent.ACTION_MOVE -> {
           Log.e("fxq", "mLastYPosition = $mLastYPosition")
           Log.e("fxq", "event.y = " + event.y)
-          if (event.y - mLastYPosition > 15) {
-            dismissAllowingStateLoss()
+          mDy = event.y - mLastYPosition
+          if (Math.abs(mDy) > 15) {
+            mLayoutExpandParams.height = if ((mLayoutExpandParams.height - mDy).toInt() < mExpandDefaultHeight) {
+              (mLayoutExpandParams.height - mDy).toInt()
+            } else {
+              mExpandDefaultHeight
+            }
+            mLayoutExpand.layoutParams = mLayoutExpandParams
           }
+          mIsExpanded = mLayoutExpandParams.height > mExpandDefaultHeight/2
         }
         MotionEvent.ACTION_UP -> {
+          mIsExpanded = mLayoutExpandParams.height > mExpandDefaultHeight/2
+          handleGestureAction(mIsExpanded)
         }
       }
       true
@@ -108,7 +129,29 @@ class ColorPickerFragment : DialogFragment() {
 
   }
 
+  fun handleGestureAction(expand: Boolean) {
+    if (expand) {
+      expandToHeight(mLayoutExpandParams.height.toFloat(), mExpandDefaultHeight.toFloat())
+    } else {
+      expandToHeight(mLayoutExpandParams.height.toFloat(), 0f)
+    }
+  }
 
+  private fun expandToHeight(start: Float, end: Float) {
+    // val objectAnimator = ObjectAnimator.ofInt(mLayoutExpand, "translationY", start, end)
+    // objectAnimator.duration = 200
+    // objectAnimator.start()
+    val valueAnimator = ValueAnimator.ofFloat(start, end)
+    valueAnimator.addUpdateListener { valueAnimator1: ValueAnimator ->
+      mLayoutExpandParams.height = (valueAnimator1.animatedValue as Float).toInt()
+      mLayoutExpand.layoutParams = mLayoutExpandParams
+      if (valueAnimator1.animatedValue == 0f) {
+        dismissAllowingStateLoss()
+      }
+    }
+    valueAnimator.duration = 200
+    valueAnimator.start()
+  }
 
   fun updatePosition() {
     val dialog = dialog ?: return

@@ -131,6 +131,9 @@ dependencies {
     //运行时权限
     implementation'pub.devrel:easypermissions:1.2.0'
 
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"
+
     implementation project(':lib-widget')
 
 

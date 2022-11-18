@@ -5,13 +5,16 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import com.fxq.kotlin.mvvm.util.TestUtil
 import com.hazz.kotlinmvp.utils.DisplayManager
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import com.squareup.leakcanary.LeakCanary
 import com.squareup.leakcanary.RefWatcher
-import com.tencent.bugly.crashreport.CrashReport
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 
@@ -44,7 +47,12 @@ class MyApplication : Application(){
         initConfig()
         DisplayManager.init(this)
         registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks)
-
+        Log.d(TAG, "isScreenOn = " + TestUtil.isScreenOn(this))
+        Log.d(TAG, "isAppOnForegroud = " + TestUtil.isAppOnForegroud(context))
+        GlobalScope.launch {
+            delay(5000)
+            Log.d(TAG, "isAppOnForegroud = " + TestUtil.isAppOnForegroud(MyApplication.context))
+        }
 
     }
 

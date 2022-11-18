@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.CardView
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -32,7 +33,7 @@ class ColorPicker : RelativeLayout {
   private val mCurrentHSV = FloatArray(3)
   private val mBgHSV = floatArrayOf(1f, 1f, 1f)
 
-  private val isRtl = true
+  private val isRtl = false
 
   constructor(context: Context) : super(context) {
     initView(context)
@@ -77,6 +78,8 @@ class ColorPicker : RelativeLayout {
         leftMargin = width - event.x
       }
       val action = event.action
+      Log.e("fxq", "mLLColorProgress action = $action")
+
       var x = 0f
       if (leftMargin < mColorBarDot.width / 2.0f) {
         colorBarLayoutParams.leftMargin = 0
@@ -115,42 +118,42 @@ class ColorPicker : RelativeLayout {
       val action = event.action
       val leftMargin: Int
       val topMargin: Int
+      Log.e("fxq", "mFakeBgColor action = $action")
+      if (isRtl) {
+        leftMargin = if (event.x > width) {
+          width
+        } else if (event.x < mLocation.width / 2f) {
+          0
+        } else {
+          (event.x - mLocation.width / 2f).toInt()
+        }
+      } else {
+        leftMargin = if (event.x > width - mLocation.width / 2f) {
+          width - mLocation.width
+        } else if (event.x < mLocation.width / 2f) {
+          0
+        } else {
+          (event.x - mLocation.width / 2f).toInt()
+        }
+      }
+      topMargin = if (event.y > height - mLocation.height / 2f) {
+        height - mLocation.height
+      } else if (event.y <= mLocation.height / 2f) {
+        0
+      } else {
+        (event.y - mLocation.height / 2f).toInt()
+      }
+      if (isRtl) {
+        vLocationLayoutParams.rightMargin = width - leftMargin
+      } else {
+        vLocationLayoutParams.leftMargin = leftMargin
+      }
+      vLocationLayoutParams.topMargin = topMargin
+      mLocation.layoutParams = vLocationLayoutParams
       when (action) {
         MotionEvent.ACTION_DOWN -> {
         }
         MotionEvent.ACTION_MOVE -> {
-          //防止越界处理
-          if (isRtl) {
-            leftMargin = if (event.x > width) {
-              width
-            } else if (event.x < mLocation.width / 2f) {
-              0
-            } else {
-              (event.x - mLocation.width / 2f).toInt()
-            }
-          } else {
-            leftMargin = if (event.x > width - mLocation.width / 2f) {
-              width - mLocation.width
-            } else if (event.x < mLocation.width / 2f) {
-              0
-            } else {
-              (event.x - mLocation.width / 2f).toInt()
-            }
-          }
-          topMargin = if (event.y > height - mLocation.height / 2f) {
-            height - mLocation.height
-          } else if (event.y <= mLocation.height / 2f) {
-            0
-          } else {
-            (event.y - mLocation.height / 2f).toInt()
-          }
-          if (isRtl) {
-            vLocationLayoutParams.rightMargin = width - leftMargin
-          } else {
-            vLocationLayoutParams.leftMargin = leftMargin
-          }
-          vLocationLayoutParams.topMargin = topMargin
-          mLocation.layoutParams = vLocationLayoutParams
           changeColor(false)
         }
         MotionEvent.ACTION_UP -> {
